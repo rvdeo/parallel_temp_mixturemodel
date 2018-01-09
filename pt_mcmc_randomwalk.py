@@ -1,5 +1,6 @@
-# Random Walk MCMC for Weighted Mixture of Distributions for  Curve Fitting.
-# Rohitash Chandra and Sally Cripps (2017).
+# Paralle Tempering Random Walk MCMC for Weighted Mixture of Distributions for  Curve Fitting.
+# Ratneel Deo and Rohitash Chandra (2017)).
+# SCIMS, USP.  deo.ratneel@gmail.com
 # CTDS, UniSYD. c.rohitash@gmail.com
 # Simulated data is used.
 

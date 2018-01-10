@@ -244,7 +244,7 @@ class ParallelTempering:
                 u = random.uniform(0, 1) 
                 swap_prob = min(1, swap_proposal[l-1])
                 if u < swap_prob : 
-                    self.swap_info(self.chains[l],self.chains[-1])
+                    self.swap_info(self.chains[l],self.chains[l-1])
                     print('chains swapped')     
             
             

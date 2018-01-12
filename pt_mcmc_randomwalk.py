@@ -21,11 +21,6 @@ import matplotlib.mlab as mlab
 import threading
 import time
 
-class forward_model:
-    def __init__ (self, paramters):
-    
-        x=parameters
-
 
 def fx_func(nModels, x, mu, sig, w):
 

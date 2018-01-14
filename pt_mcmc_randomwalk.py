@@ -236,8 +236,8 @@ class ParallelTempering:
     # Propose swapping between adajacent chains        
     def propose_swap (self, swap_proposal):
          for l in range( self.num_chains-1, 0, -1):            
-                u = random.uniform(0, 1) 
-                swap_prob = min(1, swap_proposal[l-1])
+                u = 1
+		swap_prob = swap_proposal[l-1]
                 if u < swap_prob : 
                     self.swap_info(self.chains[l],self.chains[l-1])
                     print('chains swapped')     

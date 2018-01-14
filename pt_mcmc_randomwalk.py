@@ -1,6 +1,5 @@
-# Paralle Tempering Random Walk MCMC for Weighted Mixture of Distributions for  Curve Fitting.
-# Ratneel Deo and Rohitash Chandra (2017)).
-# SCIMS, USP.  deo.ratneel@gmail.com
+# Random Walk MCMC for Weighted Mixture of Distributions for  Curve Fitting.
+# Rohitash Chandra and Sally Cripps (2017).
 # CTDS, UniSYD. c.rohitash@gmail.com
 # Simulated data is used.
 
@@ -20,6 +19,11 @@ import random
 import matplotlib.mlab as mlab
 import threading
 import time
+
+class forward_model:
+    def __init__ (self, paramters):
+    
+        x=parameters
 
 
 def fx_func(nModels, x, mu, sig, w):
@@ -189,7 +193,7 @@ class BayesMCMC:  # MCMC class
 
 
         self.lhood = self.likelihood_current
-        print(self.naccept / samples, '% was accepted')        
+        #print(self.naccept / samples, '% was accepted')        
 
         return (self.pos_mu, self.pos_sig, self.pos_w, self.pos_tau, self.fx_samples, self.lhood)
 
@@ -223,8 +227,8 @@ class ParallelTempering:
         temp = 1
         for i in xrange(0, self.num_chains):            
             self.tempratures.append(temp)
-            temp += temp #tmpr_rate
-            print(self.tempratures[i])
+            temp += tmpr_rate
+            #print(self.tempratures[i])
             
     
     # Create the chains.. Each chain gets its own temprature
@@ -237,10 +241,10 @@ class ParallelTempering:
     def propose_swap (self, swap_proposal):
          for l in range( self.num_chains-1, 0, -1):            
                 u = 1
-		swap_prob = swap_proposal[l-1]
+                swap_prob =  swap_proposal[l-1]
                 if u < swap_prob : 
                     self.swap_info(self.chains[l],self.chains[l-1])
-                    print('chains swapped')     
+                    #print('chains swapped')     
             
             
     # Swap configuration of two chains    
@@ -253,12 +257,21 @@ class ParallelTempering:
         chain_cooler.pos_sig = chain_warmer.pos_sig
         chain_cooler.pos_w = chain_warmer.pos_w
         chain_cooler.pos_tau = chain_warmer.pos_tau
+        chain_cooler.eta_current = chain_warmer.eta_current 
+        chain_cooler.nu_current = chain_warmer.nu_current
+        chain_cooler.mu_current = chain_warmer.mu_current
         
         chain_warmer.fx_samples = temp_chain.fx_samples
         chain_warmer.pos_mu = temp_chain.pos_mu
         chain_warmer.pos_sig = temp_chain.pos_sig
         chain_warmer.pos_w = temp_chain.pos_w
         chain_warmer.pos_tau = temp_chain.pos_tau
+        chain_warmer.eta_current = temp_chain.eta_current 
+        chain_warmer.nu_current = temp_chain.nu_current
+        chain_warmer.mu_current = temp_chain.mu_current
+
+
+
         
     # Merge different MCMC chains y stacking them on top of each other       
     def merge_chain (self, chain):
@@ -273,7 +286,7 @@ class ParallelTempering:
         self.initialize_chains ( nModels, ydata,x)
         swap_proposal = np.ones(self.num_chains-1) # only adjacent chains can be swapped therefore, the number of proposals is ONE less num_chains
         
-        print (self.NumSamples,self.sub_sample_size,self.NumSamples/self.sub_sample_size)
+        #print (self.NumSamples,self.sub_sample_size,self.NumSamples/self.sub_sample_size)
         #input ()
         start = 0
         end =  start + self.sub_sample_size
@@ -281,15 +294,15 @@ class ParallelTempering:
         while (end < self.NumSamples):
             
             
-            print (start, end)
-            print ('--------------------------------------\n\n')
+            #print (start, end)
+            #print ('--------------------------------------\n\n')
 
             lhood = np.zeros(self.num_chains)
             
             #run each chain for a fixed number of SAMPLING Period along the MCMC Chain
             for j in range(0,self.num_chains):        
                 self.pos_mu[j], self.pos_sig[j], self.pos_w[j], self.pos_tau[j], self.fx_samples[j], lhood[j] = self.chains[j].sample(self.NumSamples, nModels, x, ydata, start, end)
-                print (j, lhood[j])
+                #print (j, lhood[j])
                 
             
             #calculate the swap acceptance rate for parallel chains    
@@ -319,7 +332,7 @@ class ParallelTempering:
         chain_w = self.merge_chain(self.pos_w)
         chain_tau = self.merge_chain(self.pos_tau)
         chain_fx = self.merge_chain(self.fx_samples)
-        print(self.pos_mu)   
+        #print(self.pos_mu)   
              
             
         return chain_mu,chain_sig,chain_w,chain_tau,chain_fx
@@ -329,7 +342,7 @@ class ParallelTempering:
 #plot a figure of posterior distributions
 def plot_figure(list_points,title,ylabel,xlabel):
     len(list_points)
-    print (list_points)
+    #print (list_points)
     bins = np.linspace(0, 1, 100)
     plt.clf()
     plt.hist(list_points, bins)
@@ -351,13 +364,13 @@ def main():
   
     x = np.linspace(1 / ydata.size, 1, num=ydata.size)  # (input x for ydata)
 
-    NumSamples = 50000  # need to pick yourself
+    NumSamples = 500000  # need to pick yourself
     
     #Number of chains of MCMC required to be run
-    num_chains = 6
+    num_chains = 10
 
     #Maximum tempreature of hottest chain  
-    maxtemp = 100
+    maxtemp = int(num_chains * 10)/2
     
     #Create A a Patratellel Tempring object instance 
     pt = ParallelTempering(num_chains, maxtemp, NumSamples,ydata,nModels)
